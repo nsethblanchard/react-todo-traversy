@@ -1,6 +1,11 @@
 import React, { Component } from "react";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import Todos from "./components/Todos";
 import "./App.css";
+import Header from "./components/layout/header";
+import AddTodo from "./components/AddTodo";
+import About from "./components/pages/About";
+import uuid from "react-uuid";
 
 class App extends Component {
   state = {
@@ -8,23 +13,24 @@ class App extends Component {
     // array of objects which will be each todo...
     todos: [
       {
-        id: 1,
+        id: uuid(),
         title: "Take out trash",
         completed: false,
       },
       {
-        id: 2,
+        id: uuid(),
         title: "Clean bathroom",
         completed: false,
       },
       {
-        id: 3,
+        id: uuid(),
         title: "Study All the Things",
         completed: false,
       },
     ],
   };
 
+  // toggles Complete for each todo
   markComplete = (id) => {
     this.setState({
       todos: this.state.todos.map((todo) => {
@@ -36,11 +42,43 @@ class App extends Component {
     });
   };
 
+  // delete a todo
+  delTodo = (id) => {
+    this.setState({
+      todos: [...this.state.todos.filter((todo) => todo.id !== id)],
+    });
+  };
+
+  // adds a todo item
+  AddTodo = (title) => {
+    const newTodo = { id: uuid(), title: title, completed: false };
+    this.setState({ todos: [newTodo, ...this.state.todos] });
+  };
+
   render() {
     return (
-      <div className="App">
-        <Todos todos={this.state.todos} markComplete={this.markComplete} />
-      </div>
+      <Router>
+        <div className="App">
+          <div className="container">
+            <Header />
+            <Route
+              exact
+              path="/"
+              render={(props) => (
+                <>
+                  <AddTodo AddTodo={this.AddTodo} />
+                  <Todos
+                    todos={this.state.todos}
+                    markComplete={this.markComplete}
+                    delTodo={this.delTodo}
+                  />
+                </>
+              )}
+            />
+            <Route path="/about" component={About} />
+          </div>
+        </div>
+      </Router>
     );
   }
 }
